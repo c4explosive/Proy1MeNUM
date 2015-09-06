@@ -9,11 +9,11 @@
 
 typedef struct _fxpol
 {
-    float A;
-    float B;
-    float C;
-    float D;
-    float x;
+    double A;
+    double B;
+    double C;
+    double D;
+    double x;
 } fxpol;
 
 fxpol * derive_fx(fxpol * fxp, int veces)
@@ -30,10 +30,11 @@ fxpol * derive_fx(fxpol * fxp, int veces)
     }
 }
 
-void imp_exp(fxpol * fx,float A,float B,float C,float D)
+/*void imp_exp(fxpol * fx,float A,float B,float C,float D)
 {
     printf("Exp: %.0fx^%.0f+%.0fe^-%.0f\n",A,B,C,D);
-}
+    fx->A=1;fx->B=3;fx->C=1;fx->D=4;
+}*/
 
 fxpol * initfx(fxpol * fx)
 {
@@ -45,13 +46,18 @@ fxpol * initfx(fxpol * fx)
     return fx;
 }
 
+double eval_fx(double A,double B,double C,double D, double x)
+{
+    return A*pow(x,B)+C*pow(eulernum,(-1.0)*D*x);
+}
 int main()
 {
     fxpol * fx1=initfx(fx1);
-    fx1->A=1;fx1->B=3;fx1->C=1;fx1->D=4;
-    imp_exp(fx1,fx1->A,fx1->B,fx1->C,fx1->D);
-    derive_fx(fx1,1);
+    fx1->A=1.0;fx1->B=3.0;fx1->C=1.0;fx1->D=4.0;fx1->x=2.0;
+    printf("fx: %.30f\n",eval_fx(fx1->A,fx1->B,fx1->C,fx1->D,fx1->x));
     printf("df/dx: ");
-    imp_exp(fx1,fx1->A,fx1->B,fx1->C,fx1->D);
+    derive_fx(fx1,1);
+    printf(" %.30f\n",eval_fx(fx1->A,fx1->B,fx1->C,fx1->D,fx1->x));
     return 0;
 }
+
