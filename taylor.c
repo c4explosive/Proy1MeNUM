@@ -43,7 +43,7 @@ double factorial(double x)
 }
 void imp_pol(fxpol * fx)
 {
-    printf("Exp: %.0fx^%.0f+%.0fe^-%.0f\n",fx->A,fx->B,fx->C,fx->D);
+    printf("Exp: %.0fx^%.0f+%.0fe^-%.0fx\n",fx->A,fx->B,fx->C,fx->D);
     //fx->A=1;fx->B=3;fx->C=1;fx->D=4;
 }
 
@@ -139,14 +139,15 @@ void print_terms(fxpol * fx)
 int main()
 {
     fxpol * fx1=initfx(fx1);
-    int n=200;
-    fx1->A=1;fx1->B=3;fx1->C=1;fx1->D=4;fx1->x=2;fx1->x0=0;
+    int n=500;
+    fx1->A=1;fx1->B=3;fx1->C=1;fx1->D=4;fx1->x=2;fx1->x0=1;
     //input(fx1);
     printf("fx: %.30f\n",eval_fx(fx1->A,fx1->B,fx1->C,fx1->D,fx1->x));
     printf("Taylors Series: %.30f\n",taylors(fx1,n-1,0));
     /*derive_fx(fx1,4);
     print_terms(fx1);
     printf("fx: %.30f\n",eval_fx(fx1->A,fx1->B,fx1->C,fx1->D,fx1->x0));*/
+    imp_pol(fx1);
     return 0;
 }
 
