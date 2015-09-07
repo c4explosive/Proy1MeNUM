@@ -74,18 +74,28 @@ void input(fxpol * fx)
     }
 
 }
+/*double ipow(double b, double n)
+{
+    printf("N: %f\n",n);
+    if (n<0)
+	return (1/pow(b,-n));
+    else
+	return pow(b,n);
+}*/
+
 double eval_fx(double A,double B,double C,double D, double x)
 {
     return A*pow(x,B)+C*pow(eulernum,(-1.0)*D*x);
 }
 
-double taylors(fxpol * fx,int terms,int ic)
+
+double taylors(fxpol * fx,int terms,double ic)
 {
      if(ic==terms)
      {
 	fact=1;
 	tayl+=((eval_fx(fx->A,fx->B,fx->C,fx->D,fx->x0))*pow((fx->x-fx->x0),ic))/factorial(ic);
-        printf("IC: %d;\tTaylor:\t%.30f\n",ic,terms,tayl);
+        printf("IC: %.0f;\tTaylor:\t%.30f\n",ic,terms,tayl);
 	ic=0;
 	return tayl;
      }
@@ -93,7 +103,7 @@ double taylors(fxpol * fx,int terms,int ic)
      {
 	fact=1;
 	tayl+=((eval_fx(fx->A,fx->B,fx->C,fx->D,fx->x0))*pow((fx->x-fx->x0),ic))/factorial(ic);
-        printf("IC: %d;\tTaylor:\t%.30f\n",ic,terms,tayl);
+        printf("IC: %.0f;\tTaylor:\t%.30f\n",ic,terms,tayl);
 	ic++;
 	derive_fx(fx,1);
 	taylors(fx,terms,ic);
@@ -102,23 +112,38 @@ double taylors(fxpol * fx,int terms,int ic)
      {
 	fact=1;
 	tayl+=((eval_fx(fx->A,fx->B,fx->C,fx->D,fx->x0))*pow((fx->x-fx->x0),ic))/factorial(ic);
-        printf("IC: %d;\tTaylor:\t%.30f\n",ic,terms,tayl);
+        printf("IC: %.0f;\tTaylor:\t%.30f\n",ic,terms,tayl);
 	ic++;
 	derive_fx(fx,1);
 	taylors(fx,terms,ic);
      }
 }
 
+void print_terms(fxpol * fx)
+{
+    double * var=NULL;
+    char Vars[][3]={"A","B","C","D","x","x0"};
+    int i;
+    var=&(fx->A);
+    for(i=0;i<6;i++)
+    {
+	printf("%s: %.2f\n",Vars[i],*var);
+	var++;
+    }
+}
+//TODO: La derivada al evaluarla con 0 causa estraagos, no se está haciendo la derivada real, se está simulando.
 int main()
 {
     fxpol * fx1=initfx(fx1);
-    int i=0;
-    int n=60;
-    //fx1->A=1;fx1->B=3;fx1->C=1;fx1->D=4;fx1->x=2;fx1->x0=1;
-    input(fx1);
+    int n=7;
+    fx1->A=1;fx1->B=3;fx1->C=1;fx1->D=4;fx1->x=2;fx1->x0=1;
+    //input(fx1);
     printf("fx: %.30f\n",eval_fx(fx1->A,fx1->B,fx1->C,fx1->D,fx1->x));
     printf("Taylors Series: %.30f\n",taylors(fx1,n-1,0));
-    imp_pol(fx1);
+    /*derive_fx(fx1,4);
+    print_terms(fx1);
+    printf("fx: %.30f\n",eval_fx(fx1->A,fx1->B,fx1->C,fx1->D,fx1->x0));*/
     return 0;
 }
+
 
