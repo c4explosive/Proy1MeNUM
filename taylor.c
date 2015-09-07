@@ -85,7 +85,10 @@ void input(fxpol * fx)
 
 double eval_fx(double A,double B,double C,double D, double x)
 {
-    return A*pow(x,B)+C*pow(eulernum,(-1.0)*D*x);
+    if (B>=0)
+    	return A*pow(x,B)+C*pow(eulernum,(-1.0)*D*x);
+    else
+    	return A+C*pow(eulernum,(-1.0)*D*x);
 }
 
 
@@ -131,12 +134,13 @@ void print_terms(fxpol * fx)
 	var++;
     }
 }
-//TODO: La derivada al evaluarla con 0 causa estraagos, no se está haciendo la derivada real, se está simulando.
+//TODO: La derivada al evaluarla con 0 causa estragos, no se está haciendo la derivada real, se está simulando.
+//Parcialmente reparada la derivada.
 int main()
 {
     fxpol * fx1=initfx(fx1);
-    int n=7;
-    fx1->A=1;fx1->B=3;fx1->C=1;fx1->D=4;fx1->x=2;fx1->x0=1;
+    int n=200;
+    fx1->A=1;fx1->B=3;fx1->C=1;fx1->D=4;fx1->x=2;fx1->x0=0;
     //input(fx1);
     printf("fx: %.30f\n",eval_fx(fx1->A,fx1->B,fx1->C,fx1->D,fx1->x));
     printf("Taylors Series: %.30f\n",taylors(fx1,n-1,0));
