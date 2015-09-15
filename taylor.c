@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 //#include <conio.h>
 #define clrscr() system("clear")
 #define getch() system("read ")
@@ -30,7 +31,10 @@ fxpol * derive_fx(fxpol * fxp, int veces)
     else
     {
 	fxp->A=fxp->A*fxp->B;
-	fxp->B=fxp->B-1;
+	if(fxp->B>0)
+	    fxp->B=fxp->B-1;
+	else
+	    fxp->B=fxp->B+1;
 	fxp->C=fxp->C*(-1)*fxp->D;
 	veces=veces-1;
 	derive_fx(fxp,veces);
@@ -54,8 +58,43 @@ double factorial(double x)
 }
 void imp_pol(fxpol * fx)
 {
-    printf("Exp: %.0fx^%.0f+%.0fe^-%.0fx\n",fx->A,fx->B,fx->C,fx->D);
-    //fx->A=1;fx->B=3;fx->C=1;fx->D=4;
+    char exp[40]="";
+    char buf[20]="";
+    if ( (fx->A!=1 || fx->A!=-1)  && fx->A!=0)
+	sprintf(buf,"%.0f",fx->A);
+    if ( (fx->A==1 || fx->A!=-1) && fx->B==0)
+	sprintf(buf,"%.0f",fx->A);
+    strcat(exp,buf);
+    if (fx->B!=1 || fx->B!=-1)
+	sprintf(buf,"x^%.0f",fx->B);
+    else
+	sprintf(buf,"x",fx->B);
+    if (fx->B ==0)
+	sprintf(buf,"",fx->B);
+    if(fx->A==0 )
+	sprintf(buf,"");
+    strcat(exp,buf);
+    if (fx->C!=1 || fx->C!=-1)
+	sprintf(buf,"+%.0f",fx->C);
+    else
+	sprintf(buf,"");
+    if(fx->C==0)
+	sprintf(buf,"");
+    if(fx->C<0)
+	sprintf(buf,"%.0f",fx->C);
+    strcat(exp,buf);
+    if (fx->D!=1 || fx->D!=-1)
+	sprintf(buf,"e^-%0.fx",fx->D);
+    else
+	sprintf(buf,"e^-x");
+    if (fx->D==-1)
+	sprintf(buf,"e^x");
+    if(fx->D==0)
+	sprintf(buf,"");
+    if(fx->C==0)
+	sprintf(buf,"");
+    strcat(exp,buf);
+    printf("%s",exp);
 }
 
 fxpol * initfx(fxpol * fx)
@@ -77,7 +116,7 @@ void input(fxpol * fx)
     int i;
     double * val=NULL;
     val=&(fx->A);
-    for(i=0;i<6;i++)
+    for(i=0;i<4;i++)
     {
     	printf("Ingese el valor de %s: ",Vars[i]);
 	scanf("%le",val);
@@ -102,7 +141,7 @@ double er_abs(double tayl)
 
 double er_rel(double tayl)
 {
-    double err=2*(er_abs(tayl)/(ABSn(tayl)+ABSn(fxx)));
+    double err=er_abs(tayl)/ABSn(fxx);
     return err;
 }
 
@@ -120,13 +159,13 @@ double taylors(fxpol * fx,double ic)
 {
      double err_ABS=er_abs(tayl);
      double err_REL=er_rel(tayl);
-     printf("EABS: %.30f\n",err_ABS);
-     printf("EREL: %.30f\n",err_REL);
-     if(err_ABS<=epsilon)
+     //printf("EABS: %.30f\n",err_ABS);
+     //printf("EREL: %.30f\n",err_REL);
+     if(err_REL<=epsilon)
      {
 	fact=1;
 	tayl+=((eval_fx(fx->A,fx->B,fx->C,fx->D,fx->x0))*pow((fx->x-fx->x0),ic))/factorial(ic);
-        printf("IC: %.0f;\tTaylor:\t%.30f\n",ic,tayl);
+        //printf("IC: %.0f;\tTaylor:\t%.30f\n",ic,tayl);
 	ic=0;
 	eabs=err_ABS;
 	erel=err_REL;
@@ -136,7 +175,7 @@ double taylors(fxpol * fx,double ic)
      {
 	fact=1;
 	tayl+=((eval_fx(fx->A,fx->B,fx->C,fx->D,fx->x0))*pow((fx->x-fx->x0),ic))/factorial(ic);
-        printf("IC: %.0f;\tTaylor:\t%.30f\n",ic,tayl);
+        //printf("IC: %.0f;\tTaylor:\t%.30f\n",ic,tayl);
 	ic++;
 	derive_fx(fx,1);
 	taylors(fx,ic);
@@ -162,16 +201,41 @@ void ntayl()
 {
     clrscr();
     initz();
+    int cont=1,gc;
+    char op='\0';
     fxpol * fx1=initfx(fx1);
-    //fx1->A=1;fx1->B=3;fx1->C=1;fx1->D=4;fx1->x=2;fx1->x0=1;
-    printf("Ingrese los coeficientes para la función de tipo: Ax^B+Ce^(-Dx)\n");
+    double coef[4]={0};
+    printf("Ingrese los coeficientes para la función de tipo: Ax^B+Ce^(-Dx) (los exponentes se le aplicaran valor absoluto)\n");
     input(fx1);
-    fxx=eval_fx(fx1->A,fx1->B,fx1->C,fx1->D,fx1->x);
-    printf("Resultado de la serie de Taylor: %.5f\n",taylors(fx1,0));
-    printf("Error Absoluto: %.5f\n",eabs);
-    printf("Error Relativo Porcentual: %.5f%\n",erel*100);
-    printf("Valor Exacto de la función: %.5f\n",fxx);
-    getch();
+    fx1->B=ABSn(fx1->B);
+    fx1->D=ABSn(fx1->D);
+    coef[0]=fx1->A; coef[1]=fx1->B; coef[2]=fx1->C; coef[3]=fx1->D;
+    do
+    {
+    	clrscr();
+    	initz();
+    	printf("Función ingresada: \n\n\t\tf(x)=");
+    	imp_pol(fx1);
+    	//printf(";\tdonde x=%.0f y x0=%.0f\n",fx1->x,fx1->x0);
+    	printf("\n\nIngrese el valor de x: ");
+    	scanf("%le",&fx1->x);
+    	printf("Ingrese el valor de x0: ");
+    	scanf("%le",&fx1->x0);
+	while((gc=fgetc(stdin)) != EOF && gc != '\n'){}
+   	fxx=eval_fx(fx1->A,fx1->B,fx1->C,fx1->D,fx1->x);
+    	printf("\nResultado de la serie de Taylor: %.5f\n",taylors(fx1,0));
+    	printf("Error Absoluto: %.5f\n",eabs);
+    	printf("Error Relativo Porcentual: %.5f%\n",erel*100);
+    	printf("Valor Exacto de la función: %.5f\n",fxx);
+	printf("¿Continuar con esta función? S/n: ");
+	scanf("%c",&op);
+	//while((gc=fgetc(stdin)) != EOF && gc != '\n'){}
+	if (op == 'S' || op == 's')
+	    cont=1;
+	else
+	    cont=0;
+	fx1->A=coef[0]; fx1->B=coef[1]; fx1->C=coef[2]; fx1->D=coef[3]; fx1->x=0; fx1->x0=0; 
+    }while(cont);
 }
 void presentacion()
 {
