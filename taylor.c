@@ -148,7 +148,7 @@ double er_rel(double tayl)
 
 double eval_fx(double A,double B,double C,double D, double x)
 {
-    if (B>=0)
+    if (B!=0)
     	return A*pow(x,B)+C*pow(eulernum,(-1.0)*D*x);
     else
     	return A+C*pow(eulernum,(-1.0)*D*x);
